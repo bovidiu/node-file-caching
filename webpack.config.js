@@ -1,12 +1,13 @@
 const path = require('path');
 
 
-module.exports = (env, argv) => {
+module.exports = () => {
 
   return {
     entry: [
       './src/index.ts',
     ],
+    mode: 'production',
     module: {
       rules: [
         {
@@ -29,7 +30,6 @@ module.exports = (env, argv) => {
       cacheWithContext: false,
       extensions: ['.ts', '.js'],
     },
-    plugins: [ ],
     output: {
       filename: `bundle.min.js`,
       path: path.resolve(__dirname, `dist/`),
