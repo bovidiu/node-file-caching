@@ -1,8 +1,7 @@
 {
-  "name": "file-caching",
+  "name": "node-file-caching",
   "version": "0.0.0",
   "description": "File caching system",
-  "license": "MIT",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
