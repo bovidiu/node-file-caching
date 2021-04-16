@@ -1,6 +1,6 @@
 {
   "name": "node-file-caching",
-  "version": "0.0.0",
+  "version": "v0.0.0",
   "description": "File caching system",
   "main": "index.js",
   "scripts": {
@@ -54,7 +54,6 @@
     "typedoc-webpack-plugin": "^1.1.4",
     "typescript": "^4.2.4",
     "webpack": "^5.33.2",
-    "webpack-cli": "^4.6.0",
-    "wepack": "0.0.1"
+    "webpack-cli": "^4.6.0"
   }
 }

@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
+      - run: sh scripts/version_bump.sh
       - run: npm ci
       - run: npm publish
         env:
