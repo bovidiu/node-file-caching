@@ -39,6 +39,9 @@ module.exports = {
    * @param key
    */
   get: (key) => {
+    if(!existsSync('.cache')){
+      return false;
+    }
     const getFileByKey = readdirSync('.cache').filter(fn => fn.startsWith(key));
     if(!getFileByKey.length){
       return false;
