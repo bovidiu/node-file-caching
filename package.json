@@ -1,6 +1,6 @@
 {
   "name": "node-file-caching",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "File caching system",
   "main": "index.js",
   "scripts": {
