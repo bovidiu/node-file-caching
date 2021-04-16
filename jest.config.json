@@ -1,0 +1,26 @@
+{
+  "automock": false,
+  "clearMocks": true,
+  "coverageDirectory": "./reports/jest/coverage/",
+  "globals": {
+    "buildInfo": {
+      "version": "test",
+      "buildDate": "test",
+      "branch": "test",
+      "sha": "test"
+    }
+  },
+  "restoreMocks": true,
+  "reporters": [
+    "default",
+    [
+      "jest-junit",
+      {
+        "outputDirectory": "./reports/jest/"
+      }
+    ]
+  ],
+  "silent": true,
+  "testPathIgnorePatterns": ["./dist/", "./node_modules/"],
+  "verbose": false
+}
