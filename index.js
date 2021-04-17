@@ -29,7 +29,7 @@ module.exports = {
       mkdirSync(location, { recursive: true });
     }
     const fileName = `${key}_${ttl}`;
-    await writeFileSync(`${location}/${fileName}`,JSON.stringify(value),{encoding:'utf8',flag:'w'});
+    await writeFileSync(`${location}/${fileName}`,value,{encoding:'utf8',flag:'w'});
 
     return true;
   },
