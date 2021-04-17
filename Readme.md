@@ -1,4 +1,5 @@
 # Node File Caching
+#### Cache response to local cache file
 
 This is a basic module for file caching with the ability to specify the time-to-live (TTL). It doesn't have any dependency as the File System is already provided by Node.
 
@@ -13,9 +14,8 @@ This is a basic module for file caching with the ability to specify the time-to-
     - [set()](#set)
     - [remove](#remove)
     - [removeAll](#removeall)
+- [Examples](#examples)
 - [License](#license)
-- [Handling Errors](#handling-errors)
-- [Cancellation](#cancellation)
 
 
 
@@ -87,6 +87,74 @@ remove("myCacheKey");
 ### removeAll()
 This method will clear the `.cache` folder of any files and it will return `true` as response.
 
+
+# Examples
+
+ * Caching DB response
+
+```javascript
+const {get,set} = require('node-file-caching')
+
+const cacheKey = "testCacheKey";
+let outputData = get(cacheKey);
+
+if(!outputData){
+  const getDbData = "...";
+  outputData = getDbData;
+  set(cacheKey,getDbData);
+}
+return outputData;
+
+```
+
+ * Embed it as middleware (app.js)
+
+```javascript
+const {get, set} = require("node-file-caching");
+
+// define the middleware      
+app.use((req, res, next) => {
+          const cacheReqKey = req.originalUrl || req.url;
+          const cacheKey = cacheReqKey.replace(/(\/|\-)/g, '_');
+          let getCache = get(cacheKey);
+          if(!getCache){
+              res.sendResponse = res.send
+              res.send = (body) => {
+                  set(cacheKey,body);
+                  getCache = body;
+                  res.sendResponse(body)
+              }
+              next();
+          }
+          res.send( getCache );
+      })
+
+```
+
+ * Embed as middleware per route
+
+```javascript
+const {get, set} = require("node-file-caching");
+
+// define the middleware      
+const cacheResponse = (req, res, next) => {
+  const cacheReqKey = req.originalUrl || req.url;
+  const cacheKey = cacheReqKey.replace(/(\/|\-)/g, '_');
+  let getCache = get(cacheKey);
+  if(!getCache){
+    res.sendResponse = res.send
+    res.send = (body) => {
+      set(cacheKey,body);
+      getCache = body
+      res.sendResponse(body)
+    }
+    next();
+  }
+  res.send( getCache );
+}
+// Your custom routing
+app.get('/my-page',cacheResponse, controller.index);
+```
 
 ## License
 MIT
