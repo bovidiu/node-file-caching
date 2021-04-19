@@ -1,5 +1,6 @@
 # Node File Caching
 #### Cache response to local cache file
+![npm](https://img.shields.io/npm/dw/node-file-caching?style=for-the-badge)
 
 This is a basic module for file caching with the ability to specify the time-to-live (TTL). It doesn't have any dependency as the File System is already provided by Node.
 
@@ -10,8 +11,8 @@ This is a basic module for file caching with the ability to specify the time-to-
 - [Why this module?](#why-this-module)
 - [Notes](#notes)
 - [Install](#install)
-    - [get()](#get)
-    - [set()](#set)
+    - [get](#get)
+    - [set](#set)
     - [remove](#remove)
     - [removeAll](#removeall)
 - [Examples](#examples)
@@ -26,7 +27,6 @@ There are several good modules for file caching and some of them I've used for d
 ## Notes
  * This module only uses the Node File System https://nodejs.org/api/fs.html
  * Currently doesn't support custom configurations, however there's a plan to facilitate this.
- * Git repro soon will become available.
 
 ## Install
 ```bash
@@ -155,6 +155,13 @@ const cacheResponse = (req, res, next) => {
 // Your custom routing
 app.get('/my-page',cacheResponse, controller.index);
 ```
+
+## Issues
+For any issues, concerns, features or general talk on github any time.
+
+* [Issue/bug](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=bug_report.md&title=)  
+* [Feature requst](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=feature_request.md&title=)
+* [General discussions](https://github.com/bovidiu/node-file-caching/discussions)
 
 ## License
 MIT
