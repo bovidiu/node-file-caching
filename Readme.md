@@ -1,6 +1,6 @@
 # Node File Caching
 #### Cache response to local cache file
-![npm](https://img.shields.io/npm/dw/node-file-caching?style=social)
+![npm](https://img.shields.io/npm/dw/node-file-caching?style=for-the-badge)
 
 This is a basic module for file caching with the ability to specify the time-to-live (TTL). It doesn't have any dependency as the File System is already provided by Node.
 
