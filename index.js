@@ -88,7 +88,10 @@ module.exports = {
     if(!existsSync('.cache')){
       return true;
     }
-    unlinkSync(`.cache`)
+    readdirSync('.cache').map(item => {
+      unlinkSync(`.cache/${item}`)
+    })
+
     return true;
   }
 
