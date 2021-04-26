@@ -85,9 +85,10 @@ module.exports = {
    * Clear all cache files
    */
   removeAll: () => {
-    if(existsSync('.cache')){
-      unlinkSync(`.cache`)
+    if(!existsSync('.cache')){
+      return true;
     }
+    unlinkSync(`.cache`)
     return true;
   }
 
