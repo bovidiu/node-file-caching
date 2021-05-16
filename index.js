@@ -24,7 +24,7 @@ module.exports = {
    * @param value to be stored
    * @param ttl tile to live set to a 60 min default
    */
-  set: async (key, value, ttl = 60, location = '.cache') => {
+  cacheSet: async (key, value, ttl = 60, location = '.cache') => {
     if(!existsSync(location)){
       mkdirSync(location, { recursive: true });
     }
@@ -34,11 +34,23 @@ module.exports = {
     return true;
   },
   /**
+   * Set the cache file with a default of 60 TTL
+   *
+   * @param key identifier
+   * @param value to be stored
+   * @param ttl tile to live set to a 60 min default
+   * @deprecated This method will be removed.
+   */
+  set: async (key, value, ttl = 60, location = '.cache') => {
+   return this.cacheSet(key, value, ttl, location);
+  },
+
+  /**
    * Get cache file by key.
    *
    * @param key
    */
-  get: (key) => {
+  cacheGet: (key) => {
     if(!existsSync('.cache')){
       return false;
     }
@@ -66,11 +78,21 @@ module.exports = {
     return contents;
   },
   /**
+   * Get cache file by key.
+   *
+   * @param key
+   * @deprecated This method will be removed.
+   */
+  get: (key) => {
+    return this.cacheGet(key)
+  },
+
+  /**
    * Remove a cached file using its key identifier.
    *
    * @param key
    */
-  remove: (key) => {
+  cacheRemove: (key) => {
     const getFileByKey = readdirSync('.cache').filter(fn => fn.startsWith(key));
     if(!getFileByKey.length){
       return false;
@@ -82,9 +104,18 @@ module.exports = {
     return true;
   },
   /**
+   * Remove a cached file using its key identifier.
+   *
+   * @param key
+   * @deprecated This method will be removed.
+   */
+  remove:(key) => {
+    return this.cacheRemove(key);
+  },
+  /**
    * Clear all cache files
    */
-  removeAll: () => {
+  cacheRemoveAll: () => {
     if(!existsSync('.cache')){
       return true;
     }
@@ -93,6 +124,14 @@ module.exports = {
     })
 
     return true;
+  },
+  /**
+   * Clear all cache files
+   * @deprecated This method will be removed.
+   */
+  removeAll: () => {
+    return this.cacheRemoveAll();
   }
+
 
 }

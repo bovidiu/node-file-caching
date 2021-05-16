@@ -11,10 +11,10 @@ This is a basic module for file caching with the ability to specify the time-to-
 - [Why this module?](#why-this-module)
 - [Notes](#notes)
 - [Install](#install)
-    - [get](#get)
-    - [set](#set)
-    - [remove](#remove)
-    - [removeAll](#removeall)
+    - [cacheGet](#cacheGet)
+    - [cacheSet](#cacheSet)
+    - [cacheRemove](#cacheRemove)
+    - [cacheRemoveAll](#cacheRemoveAll)
 - [Examples](#examples)
 - [License](#license)
 
@@ -27,6 +27,7 @@ There are several good modules for file caching and some of them I've used for d
 ## Notes
  * This module only uses the Node File System https://nodejs.org/api/fs.html
  * Currently doesn't support custom configurations, however there's a plan to facilitate this.
+* The `depricated` methods `get, set, remove, removeAll` will re removed from the files in the near feature. 
 
 ## Install
 ```bash
@@ -35,7 +36,7 @@ There are several good modules for file caching and some of them I've used for d
 
 This package has 4 main methods that can be used and assumes that the defualt cache folder is `.cache` with a default TTL of 60 minutes.
 
-### set()
+### cacheSet()
 This method has 2 mandatory and 2 optional parameters and you'll need to use it for setting the cache. The output of this method will be `true`.
 
 `key` = Your own cache identifier
@@ -48,12 +49,12 @@ This method has 2 mandatory and 2 optional parameters and you'll need to use it 
 `.cache`, however, please don't use it as currently there's no state of configuration for persisting the cache location.
 
 ```javascript
-const {set} = require('node-file-caching');
+const {cacheSet} = require('node-file-caching');
 
-set("myCacheKey",{foo:"bar"});
+cacheSet("myCacheKey",{foo:"bar"});
 
 ```
-### get()
+### cacheGet()
 This method has 1 mandatory parameter, called `key`, which is used to get the cache file. This method has 2 response states:
 
 1. `false` = when the key doesn't exist of cache key doesn't have any content
@@ -63,13 +64,13 @@ This method has 1 mandatory parameter, called `key`, which is used to get the ca
 `key` = Cache key identifier
 
 ```javascript
-const {get} = require('node-file-caching');
+const {cacheData} = require('node-file-caching');
 
-const cacheData = get("myCacheKey");
+const cacheData = cacheGet("myCacheKey");
 
 ```
 
-### remove()
+### cacheRemove()
 This method has 1 mandatory parameter, called `key`, which is used to identify the cache file and remove it. This method has 2 response states:
 
 1. `false` = when the key doesn't exist
@@ -79,12 +80,12 @@ This method has 1 mandatory parameter, called `key`, which is used to identify t
 `key` = Cache key identifier
 
 ```javascript
-const {remove} = require('node-file-caching');
+const {cacheRemove} = require('node-file-caching');
 
-remove("myCacheKey");
+cacheRemove("myCacheKey");
 
 ```
-### removeAll()
+### cacheRemoveAll()
 This method will clear the `.cache` folder of any files and it will return `true` as response.
 
 
@@ -93,15 +94,15 @@ This method will clear the `.cache` folder of any files and it will return `true
  * Caching DB response
 
 ```javascript
-const {get,set} = require('node-file-caching')
+const {cacheGet,cacheSet} = require('node-file-caching')
 
 const cacheKey = "testCacheKey";
-let outputData = get(cacheKey);
+let outputData = cacheGet(cacheKey);
 
 if(!outputData){
   const getDbData = "...";
   outputData = getDbData;
-  set(cacheKey,getDbData);
+  cacheSet(cacheKey,getDbData);
 }
 return outputData;
 
@@ -110,23 +111,23 @@ return outputData;
  * Embed it as middleware (app.js)
 
 ```javascript
-const {get, set} = require("node-file-caching");
+const {cacheGet,cacheSet} = require("node-file-caching");
 
 // define the middleware      
 app.use((req, res, next) => {
           const cacheReqKey = req.originalUrl || req.url;
           const cacheKey = cacheReqKey.replace(/(\/|\-)/g, '_');
-          let getCache = get(cacheKey);
-          if(!getCache){
+          let getCacheData = cacheGet(cacheKey);
+          if(!getCacheData){
               res.sendResponse = res.send
               res.send = (body) => {
-                  set(cacheKey,body);
+                cacheSet(cacheKey,body);
                   getCache = body;
                   res.sendResponse(body)
               }
               next();
           }
-          res.send( getCache );
+          res.send( getCacheData );
       })
 
 ```
@@ -134,23 +135,23 @@ app.use((req, res, next) => {
  * Embed as middleware per route
 
 ```javascript
-const {get, set} = require("node-file-caching");
+const {cacheGet,cacheSet} = require("node-file-caching");
 
 // define the middleware      
 const cacheResponse = (req, res, next) => {
   const cacheReqKey = req.originalUrl || req.url;
   const cacheKey = cacheReqKey.replace(/(\/|\-)/g, '_');
-  let getCache = get(cacheKey);
-  if(!getCache){
+  let getCacheData = cacheGet(cacheKey);
+  if(!getCacheData){
     res.sendResponse = res.send
     res.send = (body) => {
-      set(cacheKey,body);
+      cacheSet(cacheKey,body);
       getCache = body
       res.sendResponse(body)
     }
     next();
   }
-  res.send( getCache );
+  res.send( getCacheData );
 }
 // Your custom routing
 app.get('/my-page',cacheResponse, controller.index);
