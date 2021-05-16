@@ -49,7 +49,7 @@ This method has 2 mandatory and 2 optional parameters and you'll need to use it 
 `.cache`, however, please don't use it as currently there's no state of configuration for persisting the cache location.
 
 ```javascript
-const {set} = require('node-file-caching');
+const {cacheSet} = require('node-file-caching');
 
 cacheSet("myCacheKey",{foo:"bar"});
 
@@ -64,7 +64,7 @@ This method has 1 mandatory parameter, called `key`, which is used to get the ca
 `key` = Cache key identifier
 
 ```javascript
-const {get} = require('node-file-caching');
+const {cacheData} = require('node-file-caching');
 
 const cacheData = cacheGet("myCacheKey");
 
@@ -80,7 +80,7 @@ This method has 1 mandatory parameter, called `key`, which is used to identify t
 `key` = Cache key identifier
 
 ```javascript
-const {remove} = require('node-file-caching');
+const {cacheRemove} = require('node-file-caching');
 
 cacheRemove("myCacheKey");
 
