@@ -18,7 +18,10 @@
     "caching",
     "node caching",
     "file caching",
-    "node file caching"
+    "node file caching",
+    "npm cache",
+    "npm caching",
+    "npm file cache"
   ],
   "author": "Ovidiu Bokar",
   "license": "MIT",
