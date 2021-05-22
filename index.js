@@ -1,4 +1,4 @@
-const {existsSync, readFileSync,readdirSync,mkdirSync,writeFileSync,statSync,unlinkSync,utimes} = require('fs');
+const {existsSync, readFileSync,readdirSync,mkdirSync,writeFileSync,statSync,unlinkSync} = require('fs');
 
 const FileCache = {
   /**
