@@ -1,6 +1,6 @@
 const {existsSync, readFileSync,readdirSync,mkdirSync,writeFileSync,statSync,unlinkSync,utimes} = require('fs');
 
-const Cache = {
+const FileCache = {
   /**
    * Load config file or set default configs.
    *
@@ -42,7 +42,7 @@ const Cache = {
    * @deprecated This method will be removed.
    */
   set: async (key, value, ttl = 60, location = '.cache') => {
-   return Cache.cacheSet(key, value, ttl, location);
+   return FileCache.cacheSet(key, value, ttl, location);
   },
 
   /**
@@ -84,7 +84,7 @@ const Cache = {
    * @deprecated This method will be removed.
    */
   get: (key) => {
-    return Cache.cacheGet(key)
+    return FileCache.cacheGet(key)
   },
 
   /**
@@ -110,7 +110,7 @@ const Cache = {
    * @deprecated This method will be removed.
    */
   remove:(key) => {
-    return Cache.cacheRemove(key);
+    return FileCache.cacheRemove(key);
   },
   /**
    * Clear all cache files
@@ -130,8 +130,8 @@ const Cache = {
    * @deprecated This method will be removed.
    */
   removeAll: () => {
-    return Cache.cacheRemoveAll();
+    return FileCache.cacheRemoveAll();
   }
 }
 
-module.exports = Cache;
+module.exports = FileCache;
