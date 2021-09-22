@@ -64,7 +64,7 @@ This method has 1 mandatory parameter, called `key`, which is used to get the ca
 `key` = Cache key identifier
 
 ```javascript
-const {cacheData} = require('node-file-caching');
+const {cacheGet} = require('node-file-caching');
 
 const cacheData = cacheGet("myCacheKey");
 
