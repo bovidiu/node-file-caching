@@ -122,7 +122,6 @@ app.use((req, res, next) => {
               res.sendResponse = res.send
               res.send = (body) => {
                 cacheSet(cacheKey,body);
-                getCache = body;
                 res.sendResponse(body)
               }
               next();
@@ -146,7 +145,6 @@ const cacheResponse = (req, res, next) => {
     res.sendResponse = res.send
     res.send = (body) => {
       cacheSet(cacheKey,body);
-      getCache = body
       res.sendResponse(body)
     }
     next();
