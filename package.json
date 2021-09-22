@@ -30,18 +30,18 @@
   },
   "homepage": "https://github.com/bovidiu/node-file-caching#readme",
   "devDependencies": {
-    "@types/jest": "^26.0.22",
-    "eslint": "^7.24.0",
-    "eslint-config-prettier": "^8.2.0",
+    "@types/jest": "^26.0.24",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
-    "jest-junit": "^12.0.0",
+    "jest-junit": "^12.3.0",
     "npm-run-all": "^4.1.5",
-    "ts-loader": "^8.1.0",
-    "typedoc": "^0.20.35",
+    "ts-loader": "^8.3.0",
+    "typedoc": "^0.20.37",
     "typedoc-webpack-plugin": "^1.1.4",
-    "typescript": "^4.2.4",
-    "webpack": "^5.33.2",
-    "webpack-cli": "^4.6.0"
+    "typescript": "^4.4.3",
+    "webpack": "^5.53.0",
+    "webpack-cli": "^4.8.0"
   }
 }
