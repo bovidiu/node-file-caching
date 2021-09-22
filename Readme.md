@@ -27,7 +27,7 @@ There are several good modules for file caching and some of them I've used for d
 ## Notes
  * This module only uses the Node File System https://nodejs.org/api/fs.html
  * Currently doesn't support custom configurations, however there's a plan to facilitate this.
-* The `depricated` methods `get, set, remove, removeAll` will re removed from the files in the near feature. 
+* The `deprecated` methods `get, set, remove, removeAll` will re removed from the files in the near feature. 
 
 ## Install
 ```bash
@@ -64,7 +64,7 @@ This method has 1 mandatory parameter, called `key`, which is used to get the ca
 `key` = Cache key identifier
 
 ```javascript
-const {cacheData} = require('node-file-caching');
+const {cacheGet} = require('node-file-caching');
 
 const cacheData = cacheGet("myCacheKey");
 
@@ -122,8 +122,8 @@ app.use((req, res, next) => {
               res.sendResponse = res.send
               res.send = (body) => {
                 cacheSet(cacheKey,body);
-                  getCache = body;
-                  res.sendResponse(body)
+                getCache = body;
+                res.sendResponse(body)
               }
               next();
           }
@@ -161,7 +161,7 @@ app.get('/my-page',cacheResponse, controller.index);
 For any issues, concerns, features or general talk on github any time.
 
 * [Issue/bug](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=bug_report.md&title=)  
-* [Feature requst](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=feature_request.md&title=)
+* [Feature request](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=feature_request.md&title=)
 * [General discussions](https://github.com/bovidiu/node-file-caching/discussions)
 
 ## License
