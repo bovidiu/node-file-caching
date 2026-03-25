@@ -219,3 +219,5 @@ out
 .yarn/install-state.gz
 .pnp.*
 
+.claude
+CLAUDE.md
