@@ -1,166 +1,304 @@
 # Node File Caching
-#### Cache response to local cache file
+#### Cache responses to local files with TTL, namespaces, and entry limits
+
 ![npm](https://img.shields.io/npm/dw/node-file-caching?style=for-the-badge)
+![npm version](https://img.shields.io/npm/v/node-file-caching?style=for-the-badge)
+![License](https://img.shields.io/npm/l/node-file-caching?style=for-the-badge)
+![Node](https://img.shields.io/node/v/node-file-caching?style=for-the-badge)
+![CI](https://img.shields.io/github/actions/workflow/status/bovidiu/node-file-caching/ci.yml?branch=main&label=CI&style=for-the-badge)
 
-This is a basic module for file caching with the ability to specify the time-to-live (TTL). It doesn't have any dependency as the File System is already provided by Node.
-
-
+Zero-dependency file caching for Node.js. Uses only the built-in File System module. Designed for platform and engineering teams that need a flexible, instance-based cache with TTL enforcement, namespace isolation, entry limits, and observability via stats.
 
 ## Table of Contents
 
-- [Why this module?](#why-this-module)
-- [Notes](#notes)
 - [Install](#install)
-    - [cacheGet](#cacheGet)
-    - [cacheSet](#cacheSet)
-    - [cacheRemove](#cacheRemove)
-    - [cacheRemoveAll](#cacheRemoveAll)
+- [Quick start](#quick-start)
+- [Module systems](#module-systems)
+- [Configuration](#configuration)
+- [API](#api)
+  - [set](#setkey-value-ttl)
+  - [get](#getkey)
+  - [remove](#removekey)
+  - [removeAll](#removeall)
+  - [stats](#stats)
 - [Examples](#examples)
+- [TypeScript](#typescript)
+- [Issues](#issues)
 - [License](#license)
 
-
-
-### Why this module?
-
-There are several good modules for file caching and some of them I've used for different projects, however, after years of working in different programming languages and mainly OOP/MVC also being used to set TTL cache I thought to put something simple in place for Node that will offer the similar opportunities. I'm using this module in production for caching pages and endpoints.
-
-## Notes
- * This module only uses the Node File System https://nodejs.org/api/fs.html
- * Currently doesn't support custom configurations, however there's a plan to facilitate this.
-* The `deprecated` methods `get, set, remove, removeAll` will re removed from the files in the near feature. 
-
 ## Install
+
 ```bash
-  npm i -S node-file-caching 
+npm i -S node-file-caching
 ```
 
-This package has 4 main methods that can be used and assumes that the defualt cache folder is `.cache` with a default TTL of 60 minutes.
-
-### cacheSet()
-This method has 2 mandatory and 2 optional parameters and you'll need to use it for setting the cache. The output of this method will be `true`.
-
-`key` = Your own cache identifier
-
-`value` = Value that you would like to store
-
-`ttl` = This is optional. Is set to 60 minutes by default.
-
-`location` = This is optional. Is set to default location of 
-`.cache`, however, please don't use it as currently there's no state of configuration for persisting the cache location.
+## Quick start
 
 ```javascript
-const {cacheSet} = require('node-file-caching');
+// CommonJS
+const FileCache = require('node-file-caching');
 
-cacheSet("myCacheKey",{foo:"bar"});
+// ES Modules
+import FileCache from 'node-file-caching';
 
-```
-### cacheGet()
-This method has 1 mandatory parameter, called `key`, which is used to get the cache file. This method has 2 response states:
+const cache = new FileCache({ location: '.cache', ttl: 60 });
 
-1. `false` = when the key doesn't exist of cache key doesn't have any content
+await cache.set('myKey', { foo: 'bar' });
 
-2. `string` = it will return the file contents of the `key`
-
-`key` = Cache key identifier
-
-```javascript
-const {cacheGet} = require('node-file-caching');
-
-const cacheData = cacheGet("myCacheKey");
-
+const data = await cache.get('myKey');
+// { foo: 'bar' }  — or undefined if missing / expired
 ```
 
-### cacheRemove()
-This method has 1 mandatory parameter, called `key`, which is used to identify the cache file and remove it. This method has 2 response states:
+## Module systems
 
-1. `false` = when the key doesn't exist
+The package ships both a CommonJS build and an ESM wrapper, so it works in any Node.js project regardless of the `"type"` field in your `package.json`.
 
-2. `true` = when the key has been removed
-
-`key` = Cache key identifier
+**CommonJS** (default for `.js` files without `"type": "module"`)
 
 ```javascript
-const {cacheRemove} = require('node-file-caching');
-
-cacheRemove("myCacheKey");
-
+const FileCache = require('node-file-caching');
 ```
-### cacheRemoveAll()
-This method will clear the `.cache` folder of any files and it will return `true` as response.
 
-
-# Examples
-
- * Caching DB response
+**ES Modules** (`.mjs` files, or `.js` files in a `"type": "module"` package)
 
 ```javascript
-const {cacheGet,cacheSet} = require('node-file-caching')
+import FileCache from 'node-file-caching';
+```
 
-const cacheKey = "testCacheKey";
-let outputData = cacheGet(cacheKey);
+**TypeScript** (works with both `"module": "CommonJS"` and `"module": "ESNext"` / `"NodeNext"`)
 
-if(!outputData){
-  const getDbData = "...";
-  outputData = getDbData;
-  cacheSet(cacheKey,getDbData);
+```typescript
+import FileCache from 'node-file-caching';
+import type { FileCacheConfig, FileCacheStats } from 'node-file-caching';
+```
+
+Node.js 14.14+ is required for both module systems.
+
+## Configuration
+
+Pass a config object or a path to a JSON config file to the constructor.
+
+```javascript
+// Config object
+const cache = new FileCache({
+  location: '.cache',   // directory to store cache files (default: '.cache')
+  ttl: 60,              // default TTL in minutes (default: 60)
+  namespace: 'api',     // isolates entries under location/namespace/ (default: null)
+  maxEntries: 500,      // evicts oldest entry when limit is reached (default: null = unlimited)
+});
+
+// From a JSON config file
+const cache = new FileCache('/path/to/cache.config.json');
+
+// All defaults
+const cache = new FileCache();
+```
+
+**`namespace`** is the key option for platform use: multiple services sharing the same host can point to the same `location` with different namespaces and their entries will never collide.
+
+**`maxEntries`** prevents unbounded disk growth in long-running services. When the limit is reached, the oldest file (by creation time) is evicted before the new entry is written.
+
+## API
+
+All methods except `stats()` return a Promise.
+
+---
+
+### `set(key, value, ttl?)`
+
+Store any JSON-serializable value. Returns `true` on success, `false` on error.
+
+- `key` — cache identifier
+- `value` — any JSON-serializable value (object, array, string, number, boolean, null)
+- `ttl` — TTL in minutes, overrides the instance default
+
+```javascript
+await cache.set('user:42', { name: 'Alice', role: 'admin' });
+
+// Custom TTL
+await cache.set('rate-limit:ip', count, 1); // expires in 1 minute
+```
+
+---
+
+### `get(key)`
+
+Retrieve a cached value. Returns the deserialized value, or `undefined` if the entry is missing or expired. Expired entries are deleted from disk on read.
+
+Using `undefined` as the miss sentinel means all JSON-serializable values — including `false`, `null`, `0`, and `""` — can be stored and retrieved unambiguously.
+
+```javascript
+const user = await cache.get('user:42');
+
+if (user === undefined) {
+  // cache miss — fetch from source
 }
-return outputData;
 
+// falsy values are safe to cache
+await cache.set('flag', false);
+const flag = await cache.get('flag'); // false (hit), not undefined (miss)
 ```
 
- * Embed it as middleware (app.js)
+---
+
+### `remove(key)`
+
+Remove an entry by key. Returns `true` if removed, `false` if not found.
 
 ```javascript
-const {cacheGet,cacheSet} = require("node-file-caching");
-
-// define the middleware      
-app.use((req, res, next) => {
-          const cacheReqKey = req.originalUrl || req.url;
-          const cacheKey = cacheReqKey.replace(/(\/|\-)/g, '_');
-          let getCacheData = cacheGet(cacheKey);
-          if(!getCacheData){
-              res.sendResponse = res.send
-              res.send = (body) => {
-                cacheSet(cacheKey,body);
-                res.sendResponse(body)
-              }
-              next();
-          }
-          res.send( getCacheData );
-      })
-
+await cache.remove('user:42');
 ```
 
- * Embed as middleware per route
+---
+
+### `removeAll()`
+
+Remove all entries (scoped to the instance's namespace if set). Returns `true`.
 
 ```javascript
-const {cacheGet,cacheSet} = require("node-file-caching");
+await cache.removeAll();
+```
 
-// define the middleware      
-const cacheResponse = (req, res, next) => {
-  const cacheReqKey = req.originalUrl || req.url;
-  const cacheKey = cacheReqKey.replace(/(\/|\-)/g, '_');
-  let getCacheData = cacheGet(cacheKey);
-  if(!getCacheData){
-    res.sendResponse = res.send
-    res.send = (body) => {
-      cacheSet(cacheKey,body);
-      res.sendResponse(body)
-    }
-    next();
+---
+
+### `stats()`
+
+Returns a synchronous snapshot of cache activity since the instance was created.
+
+```javascript
+const { hits, misses, expired, sets, errors } = cache.stats();
+```
+
+| Field | Description |
+|---|---|
+| `hits` | Successful `get` calls that returned a value |
+| `misses` | `get` calls that returned `undefined` (missing or expired) |
+| `expired` | Files deleted due to TTL expiry during `get` |
+| `sets` | Successful `set` calls |
+| `removes` | Successful `remove` calls |
+| `errors` | Filesystem errors caught across all methods |
+
+## Examples
+
+### Caching a database response
+
+```javascript
+const FileCache = require('node-file-caching');
+
+const cache = new FileCache({ location: '.cache', ttl: 10 });
+
+async function getUser(id) {
+  const cacheKey = `user:${id}`;
+  const cached = await cache.get(cacheKey);
+  if (cached) return cached;
+
+  const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+  await cache.set(cacheKey, user);
+  return user;
+}
+```
+
+### Global Express middleware
+
+```javascript
+const FileCache = require('node-file-caching');
+
+const cache = new FileCache({ location: '.cache', ttl: 5, maxEntries: 1000 });
+
+app.use(async (req, res, next) => {
+  const cacheKey = (req.originalUrl || req.url).replace(/[\\/\-]/g, '_');
+  const cached = await cache.get(cacheKey);
+
+  if (cached) {
+    return res.send(cached);
   }
-  res.send( getCacheData );
-}
-// Your custom routing
-app.get('/my-page',cacheResponse, controller.index);
+
+  res.sendResponse = res.send;
+  res.send = async (body) => {
+    await cache.set(cacheKey, body);
+    res.sendResponse(body);
+  };
+  next();
+});
 ```
+
+### Per-route middleware
+
+```javascript
+const FileCache = require('node-file-caching');
+
+const cache = new FileCache({ location: '.cache', ttl: 5 });
+
+const cacheResponse = async (req, res, next) => {
+  const cacheKey = (req.originalUrl || req.url).replace(/[\\/\-]/g, '_');
+  const cached = await cache.get(cacheKey);
+
+  if (cached) {
+    return res.send(cached);
+  }
+
+  res.sendResponse = res.send;
+  res.send = async (body) => {
+    await cache.set(cacheKey, body);
+    res.sendResponse(body);
+  };
+  next();
+};
+
+app.get('/my-page', cacheResponse, controller.index);
+```
+
+### Multiple isolated caches on the same host
+
+```javascript
+const FileCache = require('node-file-caching');
+
+const sharedRoot = '/var/cache/myapp';
+
+const apiCache = new FileCache({ location: sharedRoot, namespace: 'api',      ttl: 5  });
+const dbCache  = new FileCache({ location: sharedRoot, namespace: 'database', ttl: 60 });
+const authCache = new FileCache({ location: sharedRoot, namespace: 'auth',    ttl: 1, maxEntries: 10000 });
+```
+
+### Monitoring cache health
+
+```javascript
+setInterval(() => {
+  const s = cache.stats();
+  const hitRate = s.hits / (s.hits + s.misses) || 0;
+  console.log(`Cache hit rate: ${(hitRate * 100).toFixed(1)}% | errors: ${s.errors}`);
+}, 60_000);
+```
+
+## TypeScript
+
+Type definitions are included for both CommonJS and ESM. No additional packages required.
+
+```typescript
+import FileCache from 'node-file-caching';
+import type { FileCacheConfig, FileCacheStats } from 'node-file-caching';
+
+const config: FileCacheConfig = { location: '.cache', ttl: 60 };
+const cache = new FileCache(config);
+
+// Typed get
+const user = await cache.get<{ name: string; role: string }>('user:42');
+if (user) {
+  console.log(user.name);
+}
+
+// Stats
+const s: FileCacheStats = cache.stats();
+```
+
+Works with `"module": "CommonJS"`, `"ESNext"`, and `"NodeNext"` in `tsconfig.json`.
 
 ## Issues
-For any issues, concerns, features or general talk on github any time.
 
-* [Issue/bug](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=bug_report.md&title=)  
-* [Feature request](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=feature_request.md&title=)
+* [Report a bug](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=bug_report.md&title=)
+* [Request a feature](https://github.com/bovidiu/node-file-caching/issues/new?assignees=&labels=&template=feature_request.md&title=)
 * [General discussions](https://github.com/bovidiu/node-file-caching/discussions)
 
 ## License
+
 MIT
